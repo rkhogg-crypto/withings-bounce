@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Withings sign-in</title>
+<style>body{font:18px system-ui,sans-serif;background:#0c0a08;color:#f2ece6;padding:40px;max-width:640px}h2{color:#ff8c2e;font-weight:500}code{display:block;padding:12px;background:#17120e;border-radius:8px;word-break:break-all;color:#ffd98a;font-family:Consolas,monospace}.m{color:#a39a8f}</style></head>
+<body>
+<h2>Sending your sign-in back to the dashboard…</h2>
+<p class="m" id="msg">This page only passes the Withings sign-in code to the dashboard running on this computer. It stores nothing.</p>
+<div id="fallback" style="display:none">
+  <p>If the dashboard did not take over, it may not be running on this computer, or the port in <b>withings.json</b> differs. The code below is valid for about 30 seconds: paste it into the dashboard's Withings box (Health page &rarr; Connect iPhone &rarr; Withings).</p>
+  <code id="code"></code>
+</div>
+<script>
+(function () {
+  var PORT = 8766;                                   // must match "callbackPort" in withings.json
+  var q = new URLSearchParams(location.search);
+  var code = q.get('code'), state = q.get('state'), err = q.get('error');
+  if (err) { document.getElementById('msg').textContent = 'Withings said: ' + err; return; }
+  if (!code) { document.getElementById('msg').textContent = 'No sign-in code in this address. Start again from the dashboard.'; return; }
+  document.getElementById('code').textContent = code;
+  setTimeout(function () { document.getElementById('fallback').style.display = 'block'; }, 3500);
+  location.replace('http://localhost:' + PORT + '/withings-cb?code=' + encodeURIComponent(code) + '&state=' + encodeURIComponent(state || ''));
+})();
+</script>
+</body></html>
